@@ -301,6 +301,15 @@ export default class VanillaContextMenu extends BaseContextMenu {
   };
 
   #onShowContextMenu = (event: MouseEvent): void => {
+    
+    //NEW:
+    // console.log(event);
+    // const textArea = document.getElementById('log').childNodes[0];
+    // textArea.textContent = event.type;
+    if ((event.button != 2) && (event.type != 'long-press')) { return }
+    // console.log('Event has passed ...');
+    //ENDNEW:
+
     event.preventDefault();
     event.stopPropagation();
 
@@ -316,7 +325,12 @@ export default class VanillaContextMenu extends BaseContextMenu {
 
 
     // set the position
-    const { clientX: mouseX, clientY: mouseY } = event;
+    //REMOVED: const { clientX: mouseX, clientY: mouseY } = event;
+
+    //NEW
+    const mouseX = event.type === 'long-press' ? event.detail['clientX'] : event.clientX;
+    const mouseY = event.type === 'long-press' ? event.detail['clientY'] : event.clientY;
+    //ENDNEW
 
     const { normalizedX, normalizedY } = this.getNormalizedPosition(mouseX, mouseY, contextMenu);
 
@@ -363,6 +377,16 @@ export default class VanillaContextMenu extends BaseContextMenu {
 
     // bind the required event listeners
     this.options.scope.oncontextmenu = this.#onShowContextMenu;
+    
+    //NEW
+    this.options.scope.addEventListener('long-press', this.#onShowContextMenu);
+    this.options.scope.addEventListener('click', this.#onShowContextMenu);
+
+    this.options.scope.style['user-select'] = 'none';
+    this.options.scope.style['-webkit-user-select'] = 'none';
+    this.options.scope.style['-moz-user-select'] = 'none';
+    this.options.scope.style['-ms-user-select'] = 'none';
+    //ENDNEW
 
     // add a click event listener to create a modal effect for the context menu and close it if the user clicks outside of it
     document.addEventListener('click', this.#onDocumentClick);
