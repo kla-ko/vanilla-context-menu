@@ -303,11 +303,17 @@ export default class VanillaContextMenu extends BaseContextMenu {
   #onShowContextMenu = (event: MouseEvent): void => {
     
     //NEW:
-    // console.log(event);
-    // const textArea = document.getElementById('log').childNodes[0];
-    // textArea.textContent = event.type;
-    if ((event.button != 2) && (event.type != 'long-press')) { return }
-    // console.log('Event has passed ...');
+    console.log(event);
+    const textArea = document.getElementById('log').childNodes[0];
+    textArea.textContent = textArea.textContent + '\n' + event.type;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const textArea1 = document.getElementById('log1').childNodes[0];
+    textArea1.textContent = navigator.userAgent + ':  isSafari=' + isSafari;
+    if (isSafari ) {
+      if ( (event.type != 'long-press') && (event.button != 2) ) {return}
+    } else {
+      if ( (event.type != 'contextmenu') && (event.button != 2) ) {return}
+    }
     //ENDNEW:
 
     event.preventDefault();
@@ -379,13 +385,13 @@ export default class VanillaContextMenu extends BaseContextMenu {
     this.options.scope.oncontextmenu = this.#onShowContextMenu;
     
     //NEW
-    this.options.scope.addEventListener('long-press', this.#onShowContextMenu);
-    this.options.scope.addEventListener('click', this.#onShowContextMenu);
-
+    this.options.scope.addEventListener('long-press', this.#onShowContextMenu); // for long-press lib event
+    this.options.scope.addEventListener('click', this.#onShowContextMenu);      // for right mouse click
     this.options.scope.style['user-select'] = 'none';
     this.options.scope.style['-webkit-user-select'] = 'none';
     this.options.scope.style['-moz-user-select'] = 'none';
     this.options.scope.style['-ms-user-select'] = 'none';
+
     //ENDNEW
 
     // add a click event listener to create a modal effect for the context menu and close it if the user clicks outside of it
